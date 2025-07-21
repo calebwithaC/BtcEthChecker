@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crypto Price Tracker</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0e1117;
+      color: #f0f0f0;
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1.5rem;
+    }
+    .price {
+      font-size: 1.8rem;
+      margin: 1rem 0;
+    }
+    .updated {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 2rem;
+    }
+    button {
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #1e90ff;
+      color: white;
+      cursor: pointer;
+      margin-top: 1rem;
+    }
+    button:hover {
+      background-color: #1c7ed6;
+    }
+  </style>
+</head>
+<body>
+  <h1>🪙 Live Crypto Prices</h1>
+
+  <div class="price" id="btc-usd">BTC → USD: Loading...</div>
+  <div class="price" id="eth-usd">ETH → USD: Loading...</div>
+  <div class="price" id="eth-btc">ETH → BTC: Loading...</div>
+
+  <button onclick="updatePrices()">🔄 Refresh Now</button>
+
+  <div class="updated" id="last-updated">Last updated: —</div>
+
+  <script>
+    async function updatePrices() {
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd");
+        const data = await res.json();
+        const btc = data.bitcoin.usd;
+        const eth = data.ethereum.usd;
+        const ethBtc = (eth / btc).toFixed(6);
+
+        document.getElementById("btc-usd").textContent = `BTC → USD: $${btc.toLocaleString()}`;
+        document.getElementById("eth-usd").textContent = `ETH → USD: $${eth.toLocaleString()}`;
+        document.getElementById("eth-btc").textContent = `ETH → BTC: ${ethBtc}`;
+        document.getElementById("last-updated").textContent = `Last updated: ${new Date().toLocaleTimeString()}`;
+      } catch (err) {
+        console.error("Failed to fetch prices", err);
+        alert("Error fetching prices. Please check your internet connection.");
+      }
+    }
+
+    updatePrices(); // Load on start
+    setInterval(updatePrices, 60000); // Auto-refresh every minute
+  </script>
+</body>
+</html>
